@@ -14,7 +14,7 @@ This repository provides machine-learning–based abundance corrections
 ## Requirements 
 numpy\
 pandas\
-scikit-learn\
+scikit-learn==1.5.1\
 joblib
 
 ## Usage
