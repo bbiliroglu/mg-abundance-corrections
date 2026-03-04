@@ -23,17 +23,17 @@ python3 main_mg_aberr.py input_file output_file
 ```
 
 ## Input Format
-The input file can be in CSV or XLSX format. The following columns are required:\
+The input file can be in CSV or XLSX format. The following columns are required:
 
-Teff: Effective temperature (K).\
+Teff: Effective temperature (K).
 
-logg: Surface gravity ($\log g$).\
+logg: Surface gravity ($\log g$).
 
-A(Mg): The 1D-LTE magnesium abundance (used as the baseline).\
+A(Mg): The 1D-LTE magnesium abundance (used as the baseline).
 
-vmic: Microturbulent velocity (km/s).\
+vmic: Microturbulent velocity (km/s).
 
-line: The central wavelength of the Mg I line (nm).\
+line: The central wavelength of the Mg I line (nm).
 
 ### Example 
 Teff,logg,A(Mg),vmic,line
@@ -43,7 +43,7 @@ Teff,logg,A(Mg),vmic,line
 5750,4.5,7.0,1.2,516.7
 
 ## Output
-The output file will include all original columns plus a new column:\
+The output file will include all original columns plus a new column:
 
 abundance_error (1L-3N): This represents the difference between the 1D-LTE and 3D-NLTE magnesium abundances.
 
