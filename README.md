@@ -1,7 +1,7 @@
 # Mg I abundance corrections
 
 This repository provides machine-learning–based abundance corrections  
-(1D LTE − 3D NLTE) for selected Mg I spectral lines.
+(3D NLTE - 1D LTE) for selected Mg I spectral lines.
 
 ## Supported lines (nm)
 - 416.7
