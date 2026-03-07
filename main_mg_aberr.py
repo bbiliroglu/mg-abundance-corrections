@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Mg I abundance corrections (1D LTE − 3D NLTE)
+Mg I abundance corrections (3D NLTE - 1D LTE)
 
 Usage:
     python3 main_mg_aberr.py input.csv output.csv
@@ -14,8 +14,7 @@ import argparse
 import pandas as pd
 import numpy as np
 import joblib
-import re
-
+import sys
 from pathlib import Path
 
 #%%
@@ -77,7 +76,8 @@ def main():
     else:
         print(f"Unsupported input format: {input_path.suffix}. Please use .xlsx or .csv")
         return
-
+    
+    # Check for required columns
     df.columns = df.columns.str.strip()
     required = ["Teff", "logg", "A(Mg)", "vmic", "line"]
     missing = [col for col in required if col not in df.columns]
@@ -91,25 +91,31 @@ def main():
     for idx, row in df.iterrows():
         try:
             line_val = float(row["line"])
-            correction = np.nan
+            pred_error = np.nan
             
+            # Predict "error" from model
             if abs(line_val - 457.1) <= 0.2:
                 feat = pd.DataFrame([row[["Teff", "logg", "A(Mg)", "vmic"]].values], 
                                     columns=["Teff", "logg", "A(Mg)", "vmic"])
-                correction = model_457.predict(feat)[0]
+                pred_error = model_457.predict(feat)[0]
             
             elif any(abs(line_val - l) <= 0.2 for l in UNIFIED_LINES):
                 true_lam = min(UNIFIED_LINES, key=lambda x: abs(x - line_val))
                 feat_dict = get_features_unified(row, true_lam)
                 feat_df = pd.DataFrame([feat_dict])
-                correction = model_unified.predict(feat_df)[0]
+                pred_error = model_unified.predict(feat_df)[0]
             
+            # CONVERSION: Correction = -1 * Error
+            # If error is (1D - 3D), then correction is (3D - 1D)
+            correction = -1.0 * pred_error
             results.append(correction)
+            
         except Exception as e:
             results.append(np.nan)
             print(f"Error at row {idx+1}: {e}")
 
-    df["abundance_error (1L-3N)"] = results
+    # Renamed column to reflect correction
+    df["abundance_correction (3N-1L)"] = results
     
     # Output Saving
     if args.output.lower().endswith(".csv"):
@@ -117,7 +123,7 @@ def main():
     else:
         df.to_excel(args.output, index=False)
     
-    print(f"\nSuccessful, results now saved to '{args.output}'")
+    print(f"\nSuccessful, results saved to '{args.output}'")
 
 if __name__ == "__main__":
     main()
